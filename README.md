@@ -37,16 +37,16 @@ A full-stack Document Management System built using Python, Flask, MongoDB, and 
 ## Project Structure
 
 ```text
-triad-dms/
+triad-ai-document-management-system/
 │
 ├── backend/
 │   ├── app.py
 │   ├── auth.py
+│   ├── cleanup_documents.py
 │   ├── database.py
 │   ├── documents.py
 │   ├── metadata.py
-│   ├── requirements.txt
-│   └── .env
+│   └── requirements.txt
 │
 ├── frontend/
 │   ├── index.html
@@ -70,8 +70,8 @@ Install the following before running the application:
 ### 1. Clone the Repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd triad-dms
+git clone https://github.com/AnilUggam/triad-ai-document-management-system.git
+cd triad-ai-document-management-system
 ```
 
 ### 2. Set Up the Backend
@@ -92,8 +92,9 @@ Configure the required MongoDB connection string and JWT secret according to you
 Example:
 
 ```env
-MONGO_URI=mongodb://localhost:27017/triad_dms
-JWT_SECRET_KEY=replace_with_a_secure_random_secret
+MONGO_URI=your_mongodb_connection_string
+SECRET_KEY=your_flask_secret
+JWT_SECRET_KEY=your_jwt_secret
 ```
 
 Do not commit real passwords, database credentials, or secret keys to GitHub.

@@ -1,0 +1,30 @@
+
+# Environment secrets
+backend/.env
+.env
+
+# Python virtual environments
+backend/venv/
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+
+# Local testing and review files
+admin_download_test.txt
+backend_review.txt
+backend_source.txt
+division_b.txt
+downloaded_sample.txt
+frontend_source.txt
+ocr_test.txt
+project-source-review.txt
+sample.txt

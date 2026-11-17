@@ -1,0 +1,1087 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f6fc">
+
+    <title>TRIAD AI | Document Intelligence Workspace</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         AUTHENTICATION SCREEN
+    ====================================================== -->
+
+    <main id="authScreen" class="auth-screen">
+
+        <div class="auth-bg-glow glow-1"></div>
+        <div class="auth-bg-glow glow-2"></div>
+
+        <section class="auth-card">
+
+            <div class="brand auth-brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                        <polyline points="2 17 12 22 22 17"/>
+                        <polyline points="2 12 12 17 22 12"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>TRIAD <span>AI</span></h1>
+                    <p>Document Intelligence System</p>
+                </div>
+            </div>
+
+            <div class="auth-heading">
+                <h2 id="authTitle">Welcome back</h2>
+                <p id="authSubtitle">
+                    Sign in to access your division's document workspace.
+                </p>
+            </div>
+
+            <div class="auth-tabs">
+                <button id="loginTab" class="auth-tab active"
+                    type="button" onclick="showLogin()">
+                    Sign In
+                </button>
+
+                <button id="registerTab" class="auth-tab"
+                    type="button" onclick="showRegister()">
+                    Create Account
+                </button>
+            </div>
+
+            <div id="message" class="message" role="alert"></div>
+
+            <!-- LOGIN FORM -->
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label for="loginEmail">Email address</label>
+                    <input type="email" id="loginEmail"
+                        placeholder="name@company.com"
+                        required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword"
+                        placeholder="••••••••"
+                        required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="primary-btn full-width">
+                    <span>Sign In to Workspace</span>
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </button>
+
+            </form>
+
+            <!-- REGISTER FORM -->
+
+            <form id="registerForm" class="hidden">
+
+                <div class="form-group">
+                    <label for="registerUsername">Full name</label>
+                    <input type="text" id="registerUsername"
+                        placeholder="Alex Morgan"
+                        required autocomplete="name">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerEmail">Email address</label>
+                    <input type="email" id="registerEmail"
+                        placeholder="name@company.com"
+                        required autocomplete="email">
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword"
+                            placeholder="••••••••"
+                            required autocomplete="new-password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerDivision">Division</label>
+
+                        <select id="registerDivision" required>
+                            <option value="">Select division</option>
+                            <option value="Division A">Division A</option>
+                            <option value="Division B">Division B</option>
+                            <option value="Division C">Division C</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="primary-btn full-width">
+                    <span>Create Workspace Account</span>
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </button>
+
+            </form>
+
+            <p class="auth-footer">
+                Protected by Role-Based Division Isolation & OCR Indexing
+            </p>
+
+        </section>
+    </main>
+
+
+    <!-- =====================================================
+         MAIN APPLICATION
+    ====================================================== -->
+
+    <main id="appScreen" class="app-screen hidden">
+
+        <div id="sidebarBackdrop"
+            class="sidebar-backdrop"
+            onclick="toggleSidebar()">
+        </div>
+
+
+        <!-- SIDEBAR -->
+
+        <aside id="sidebar" class="sidebar">
+
+            <div class="brand sidebar-brand">
+
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                        <polyline points="2 17 12 22 22 17"/>
+                        <polyline points="2 12 12 17 22 12"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h1>TRIAD <span>AI</span></h1>
+                    <p>Document Intelligence</p>
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-label">WORKSPACE</div>
+
+
+            <nav class="navigation">
+
+                <button class="nav-item active"
+                    data-view="homeView"
+                    onclick="navigateTo('homeView', this)">
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+
+                    <span>Dashboard</span>
+                </button>
+
+
+                <button class="nav-item"
+                    data-view="documentsView"
+                    onclick="navigateTo('documentsView', this)">
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+
+                    <span>All Documents</span>
+                    <span id="navDocBadge" class="nav-badge">0</span>
+                </button>
+
+
+                <button class="nav-item"
+                    data-view="favoritesView"
+                    onclick="navigateTo('favoritesView', this)">
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+
+                    <span>Favorites</span>
+                    <span id="navFavBadge" class="nav-badge">0</span>
+                </button>
+
+
+                <button class="nav-item"
+                    data-view="uploadView"
+                    onclick="navigateTo('uploadView', this)">
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+
+                    <span>Upload Document</span>
+                </button>
+                <button id="metadataNavItem"
+    class="nav-item hidden"
+    data-view="metadataView"
+    onclick="navigateTo('metadataView', this)">
+
+    <svg width="18" height="18" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.8.1l-.2.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2.1-2.9-1.7.1-.2a1.7 1.7 0 0 0-.1-1.8l-.1-.2v-3.4l.2-.1a1.7 1.7 0 0 0 1-1.5l-.1-.2 1.7-2.9.2.1a1.7 1.7 0 0 0 1.8-.1l.2-.1h3.4l.1.2a1.7 1.7 0 0 0 1.5 1l.2-.1 2.9 1.7-.1.2a1.7 1.7 0 0 0 .1 1.8l.1.2z"/>
+    </svg>
+
+    <span>Metadata Settings</span>
+</button>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <div class="sidebar-help">
+
+                    <div class="help-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </div>
+
+                    <h3>OCR Full-Text Search</h3>
+
+                    <p>
+                        Search inside scanned PDFs, images, and text files automatically.
+                    </p>
+
+                </div>
+
+
+                <button class="nav-item logout-item" onclick="logout()">
+
+                    <svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+
+                    <span>Sign Out</span>
+
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN CONTENT
+        ================================================== -->
+
+        <section class="main-content">
+
+
+            <!-- TOP BAR -->
+
+            <header class="topbar">
+
+                <div class="topbar-left">
+
+                    <button class="menu-btn"
+                        onclick="toggleSidebar()"
+                        aria-label="Toggle Menu">
+
+                        <svg width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <line x1="3" y1="18" x2="21" y2="18"/>
+                        </svg>
+
+                    </button>
+
+                    <div>
+                        <p class="topbar-small">DIVISION WORKSPACE</p>
+                        <h2 id="topbarTitle">Dashboard Overview</h2>
+                    </div>
+
+                </div>
+
+
+                <div class="topbar-actions">
+
+                    <button id="themeToggle"
+                        class="appearance-btn"
+                        onclick="toggleTheme()"
+                        title="Switch theme">
+
+                        <span id="themeIcon">🌙</span>
+                        <span id="themeText">Dark Mode</span>
+
+                    </button>
+
+
+                    <div class="user-profile">
+
+                        <div id="userAvatar" class="user-avatar">U</div>
+
+                        <div class="user-meta">
+                            <strong id="topUserName">User</strong>
+                            <span id="topUserDivision" class="division-pill">
+                                Member
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- GLOBAL NOTIFICATION -->
+
+            <div id="dashboardMessage"
+                class="message"
+                role="status">
+            </div>
+
+
+            <!-- =================================================
+                 DASHBOARD VIEW
+            ================================================== -->
+
+            <section id="homeView" class="content-view">
+
+                <div class="welcome-banner">
+
+                    <div class="welcome-text">
+                        <p class="eyebrow">ACTIVE WORKSPACE</p>
+
+                        <h1>
+                            Welcome back,
+                            <span id="welcomeUser">User</span>
+                        </h1>
+
+                        <p>
+                            Manage, preview, and search your division's indexed documents in one place.
+                        </p>
+                    </div>
+
+
+                    <div class="welcome-actions">
+
+                        <button class="secondary-btn"
+                            onclick="navigateTo('documentsView')">
+                            Browse Library
+                        </button>
+
+                        <button class="primary-btn"
+                            onclick="navigateTo('uploadView')">
+
+                            <svg width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+
+                            <span>Upload File</span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATISTICS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon blue-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <p>Accessible Documents</p>
+                            <h2 id="totalDocuments">0</h2>
+                            <span>Indexed in division</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon pink-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <p>Saved Favorites</p>
+                            <h2 id="totalFavorites">0</h2>
+                            <span>Pinned for quick access</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon green-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <p>Assigned Division</p>
+                            <h2 id="divisionStat">—</h2>
+                            <span>RBAC access boundary</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT DOCUMENTS -->
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>Recently Added</h2>
+                        <p>Latest documents uploaded to your workspace</p>
+                    </div>
+
+                    <button class="text-btn"
+                        onclick="navigateTo('documentsView')">
+                        View all documents →
+                    </button>
+
+                </div>
+
+                <div id="recentDocuments" class="document-grid"></div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ALL DOCUMENTS VIEW
+            ================================================== -->
+
+            <section id="documentsView" class="content-view hidden">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">DOCUMENT REPOSITORY</p>
+                        <h1>All Documents</h1>
+
+                        <p>
+                            Search by filename or extracted OCR text across your accessible documents.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="toolbar">
+
+                    <div class="search-box">
+
+                        <svg width="18" height="18" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+
+                        <input type="text"
+                            id="searchInput"
+                            placeholder="Search filenames, keywords, or OCR text..."
+                            oninput="searchDocuments()">
+
+                        <button id="clearSearchBtn"
+                            class="clear-search hidden"
+                            onclick="clearSearch()"
+                            title="Clear search">
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <div class="toolbar-right">
+
+                        <div class="filter-pills" id="typeFilters">
+
+                            <button class="filter-pill active"
+                                data-filter="all"
+                                onclick="filterByType('all', this)">
+                                All
+                            </button>
+
+                            <button class="filter-pill"
+                                data-filter="pdf"
+                                onclick="filterByType('pdf', this)">
+                                PDF
+                            </button>
+
+                            <button class="filter-pill"
+                                data-filter="txt"
+                                onclick="filterByType('txt', this)">
+                                TXT
+                            </button>
+
+                            <button class="filter-pill"
+                                data-filter="img"
+                                onclick="filterByType('img', this)">
+                                Images
+                            </button>
+
+                        </div>
+
+                        <span id="documentCount" class="document-count">
+                            0 documents
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div id="documentsList" class="document-grid"></div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 FAVORITES VIEW
+            ================================================== -->
+
+            <section id="favoritesView" class="content-view hidden">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">PINNED COLLECTION</p>
+                        <h1>Favorite Documents</h1>
+                        <p>Instant access to your bookmarked files.</p>
+                    </div>
+
+                </div>
+
+                <div id="favoritesList" class="document-grid"></div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 UPLOAD VIEW
+            ================================================== -->
+
+            <section id="uploadView" class="content-view hidden">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">INGESTION PIPELINE</p>
+                        <h1>Upload Document</h1>
+
+                        <p>
+                            Files are securely stored in GridFS and automatically indexed via OCR.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="upload-panel">
+
+                    <form id="uploadForm">
+
+                        <label id="dropZone"
+                            class="upload-dropzone"
+                            for="documentFile">
+
+                            <div class="dropzone-icon">
+
+                                <svg width="28" height="28"
+                                    viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+
+                            </div>
+
+                            <h3>
+                                Drag & drop your file here, or click to browse
+                            </h3>
+
+                            <p>
+                                Supports PDF, TXT, PNG, JPG, and JPEG formats
+                            </p>
+
+                            <span class="choose-file-btn">Select File</span>
+
+                            <input type="file"
+                                id="documentFile"
+                                accept=".pdf,.txt,.png,.jpg,.jpeg"
+                                required>
+
+                        </label>
+
+
+                        <div id="selectedFileCard"
+                            class="selected-file-card hidden">
+
+                            <div class="selected-file-info">
+
+                                <span id="selectedFileIcon"
+                                    class="file-type-badge">
+                                    FILE
+                                </span>
+
+                                <div>
+                                    <strong id="selectedFileName">
+                                        document.pdf
+                                    </strong>
+
+                                    <span id="selectedFileSize">0 KB</span>
+                                </div>
+
+                            </div>
+
+                            <button type="button"
+                                class="remove-file-btn"
+                                onclick="resetFileSelection()"
+                                title="Remove file">
+                                ×
+                            </button>
+
+                        </div>
+
+
+                        <button type="submit"
+                            id="uploadSubmitBtn"
+                            class="primary-btn upload-submit">
+
+                            <span>Upload & Index Document</span>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 OTHER DIVISIONS' DOCUMENTS
+            ================================================== -->
+
+            <section id="discoverView" class="content-view hidden">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">CROSS-DIVISION DOCUMENT SHARING</p>
+
+                        <h1>Other Divisions' Documents</h1>
+
+                        <p>
+                            Discover documents explicitly shared by other divisions.
+                            Request access to view or download them.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="toolbar">
+
+                    <div class="search-box">
+
+                        <svg width="18" height="18"
+                            viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21"
+                                x2="16.65" y2="16.65"/>
+
+                        </svg>
+
+                        <input type="text"
+                            id="discoverSearchInput"
+                            placeholder="Search shared documents, divisions, or metadata..."
+                            oninput="searchDiscoveredDocuments()">
+
+                    </div>
+
+                    <div class="toolbar-right">
+                        <span id="discoverCount" class="document-count">
+                            0 shared documents
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="sharing-information">
+                    <strong>🔐 Access protection</strong>
+
+                    <p>
+                        Documents shown here are shared by their owning divisions.
+                        Preview and download remain locked until your access request is approved.
+                    </p>
+                </div>
+
+
+                <div id="discoverList" class="document-grid"></div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 MY ACCESS REQUESTS
+            ================================================== -->
+
+            <section id="myRequestsView" class="content-view hidden">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">ACCESS MANAGEMENT</p>
+
+                        <h1>My Access Requests</h1>
+
+                        <p>
+                            Track the documents you have requested from other divisions.
+                        </p>
+                    </div>
+
+                    <button class="secondary-btn"
+                        onclick="loadMyAccessRequests()">
+                        Refresh Requests
+                    </button>
+
+                </div>
+
+
+                <div class="sharing-information">
+
+                    <strong>Request status guide</strong>
+
+                    <p>
+                        Pending: waiting for admin review.
+                        Approved: document access granted.
+                        Rejected: access not granted.
+                    </p>
+
+                </div>
+
+
+                <div id="myRequestsList" class="document-grid"></div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ADMIN ACCESS REQUEST INBOX
+            ================================================== -->
+
+            <section id="accessInboxView" class="content-view hidden">
+
+                <div class="page-heading">
+
+                    <div>
+                        <p class="eyebrow">ADMINISTRATION</p>
+
+                        <h1>Access Request Inbox</h1>
+
+                        <p>
+                            Review requests for documents owned by your division.
+                            Approve or reject each request.
+                        </p>
+                    </div>
+
+                    <button class="secondary-btn"
+                        onclick="loadAccessInbox()">
+                        Refresh Inbox
+                    </button>
+
+                </div>
+
+
+                <div class="sharing-information">
+
+                    <strong>Division-level approval</strong>
+
+                    <p>
+                        You can only review access requests for documents belonging
+                        to your own division.
+                    </p>
+
+                </div>
+
+
+                <div id="accessInboxList" class="document-grid"></div>
+
+            </section>
+
+            <!-- METADATA SETTINGS VIEW -->
+
+<section id="metadataView" class="content-view hidden">
+
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">ADMINISTRATION</p>
+            <h1>Metadata Settings</h1>
+            <p>
+                Create and manage dynamic document metadata fields.
+            </p>
+        </div>
+    </div>
+
+    <div class="upload-panel">
+
+        <h2>Add Metadata Field</h2>
+        <p>Define a new field for document classification.</p>
+
+        <form id="metadataFieldForm">
+
+            <div class="form-group">
+                <label for="metadataFieldName">Field Name</label>
+                <input
+                    type="text"
+                    id="metadataFieldName"
+                    placeholder="Example: Department Name"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="metadataFieldType">Field Type</label>
+                <select id="metadataFieldType" required>
+                    <option value="text">Text</option>
+                    <option value="number">Number</option>
+                    <option value="date">Date</option>
+                    <option value="boolean">Boolean</option>
+                </select>
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Add Metadata Field
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="section-heading">
+        <div>
+            <h2>Existing Metadata Fields</h2>
+            <p>Manage the fields currently available in your system.</p>
+        </div>
+
+        <button class="secondary-btn"
+            type="button"
+            onclick="loadMetadataSettings()">
+            Refresh Fields
+        </button>
+    </div>
+
+    <div id="metadataFieldsList" class="document-grid"></div>
+
+</section>
+
+            <!-- FOOTER -->
+
+            <footer class="app-footer">
+
+                <span>© 2026 TRIAD AI</span>
+
+                <span>
+                    Document Intelligence & RBAC Management System
+                </span>
+
+            </footer>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         DOCUMENT VIEWER MODAL
+    ====================================================== -->
+
+    <div id="viewerModal"
+        class="viewer-modal hidden"
+        onclick="handleModalBackdropClick(event)">
+
+        <div class="viewer-window">
+
+            <div class="viewer-header">
+
+                <div class="viewer-title-group">
+
+                    <span id="viewerTypeBadge"
+                        class="doc-badge badge-default">
+                        FILE
+                    </span>
+
+                    <div>
+                        <h2 id="viewerTitle">Document Preview</h2>
+
+                        <p id="viewerSubtitle" class="viewer-sub">
+                            Division Workspace
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="viewer-actions">
+
+                    <a id="viewerDownload"
+                        class="primary-btn compact-btn"
+                        href="#">
+
+                        <svg width="15" height="15"
+                            viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+
+                        <span>Download</span>
+
+                    </a>
+
+
+                    <button class="close-viewer"
+                        onclick="closeViewer()"
+                        aria-label="Close Preview">
+                        ×
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div id="viewerContent" class="viewer-content"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- APPLICATION JAVASCRIPT -->
+
+    <script src="script.js"></script>
+
+</body>
+</html>

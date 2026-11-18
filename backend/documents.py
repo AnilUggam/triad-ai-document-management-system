@@ -434,8 +434,7 @@ def discover_documents():
         return jsonify({"error": "User not found"}), 404
 
     documents = documents_collection.find({
-        "division": {"$ne": user["division"]},
-        "is_shared": True
+        "division": {"$ne": user["division"]}
     })
 
     result = []
@@ -451,11 +450,11 @@ def discover_documents():
                 if doc.get("upload_date")
                 else None
             ),
+            "is_shared": bool(doc.get("is_shared", False)),
             "metadata": doc.get("metadata", {})
         })
 
     return jsonify({"documents": result}), 200
-
 
 # --------------------------------------------------
 # 4. SHARE / UNSHARE A DOCUMENT
@@ -589,6 +588,7 @@ def request_document_access():
     document_id = data.get("doc_id", data.get("document_id"))
     reason = data.get("reason", "Access requested")
 
+    # Validate document ID
     if (
         not isinstance(document_id, str)
         or not ObjectId.is_valid(document_id)
@@ -597,6 +597,7 @@ def request_document_access():
             "error": "Valid document ID is required"
         }), 400
 
+    # Validate reason
     if not isinstance(reason, str):
         return jsonify({"error": "Reason must be text"}), 400
 
@@ -610,6 +611,7 @@ def request_document_access():
             "error": "Reason cannot exceed 500 characters"
         }), 400
 
+    # Find document
     document = documents_collection.find_one({
         "file_id": ObjectId(document_id)
     })
@@ -617,16 +619,13 @@ def request_document_access():
     if not document:
         return jsonify({"error": "Document not found"}), 404
 
+    # Prevent requests for documents in the user's own division
     if document["division"] == user["division"]:
         return jsonify({
             "error": "You already have access to this document"
         }), 400
 
-    if not document.get("is_shared", False):
-        return jsonify({
-            "error": "This document is not available for discovery"
-        }), 403
-
+    # Check whether access is already approved
     existing = access_requests_collection.find_one({
         "document_id": ObjectId(document_id),
         "requester_id": str(user["_id"]),
@@ -638,6 +637,7 @@ def request_document_access():
             "error": "You already have approved access"
         }), 409
 
+    # Check whether a request is already pending
     existing = access_requests_collection.find_one({
         "document_id": ObjectId(document_id),
         "requester_id": str(user["_id"]),
@@ -649,6 +649,7 @@ def request_document_access():
             "error": "You already have a pending request"
         }), 409
 
+    # Create access request
     access_requests_collection.insert_one({
         "document_id": ObjectId(document_id),
         "filename": document["filename"],
@@ -664,7 +665,6 @@ def request_document_access():
         "message": "Access request submitted successfully",
         "status": "pending"
     }), 201
-
 
 # --------------------------------------------------
 # 7. MY ACCESS REQUESTS
@@ -719,11 +719,6 @@ def view_access_requests():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    if user.get("role") != "admin":
-        return jsonify({
-            "error": "Admin access required"
-        }), 403
-
     requests_cursor = access_requests_collection.find({
         "owner_division": user["division"]
     }).sort("created_at", -1)
@@ -764,11 +759,6 @@ def update_access_request(request_id):
 
     if not user:
         return jsonify({"error": "User not found"}), 404
-
-    if user.get("role") != "admin":
-        return jsonify({
-            "error": "Admin access required"
-        }), 403
 
     if not ObjectId.is_valid(request_id):
         return jsonify({"error": "Invalid request ID"}), 400
@@ -842,6 +832,7 @@ def update_access_request(request_id):
 # 10. SEARCH ACCESSIBLE DOCUMENTS
 # --------------------------------------------------
 
+
 @documents_bp.route("/search", methods=["GET"])
 @jwt_required()
 def search_documents():
@@ -852,6 +843,8 @@ def search_documents():
         return jsonify({"error": "User not found"}), 404
 
     search_term = request.args.get("q", "").strip()
+    division_filter = request.args.get("division", "").strip()
+    report_type_filter = request.args.get("report_type", "").strip()
 
     if not search_term:
         return jsonify({"error": "Search term is required"}), 400
@@ -859,6 +852,11 @@ def search_documents():
     if len(search_term) > 100:
         return jsonify({
             "error": "Search term cannot exceed 100 characters"
+        }), 400
+
+    if len(division_filter) > 100 or len(report_type_filter) > 100:
+        return jsonify({
+            "error": "Filter value is too long"
         }), 400
 
     search_pattern = re.escape(search_term)
@@ -879,52 +877,61 @@ def search_documents():
         ]
     }
 
-    search_filter = {
-        "$and": [
-            access_filter,
+    search_clause = {
+        "$or": [
             {
-                "$or": [
-                    {
-                        "filename": {
-                            "$regex": search_pattern,
-                            "$options": "i"
-                        }
-                    },
-                    {
-                        "extracted_text": {
-                            "$regex": search_pattern,
-                            "$options": "i"
-                        }
-                    },
-                    {
-                        "$expr": {
-                            "$anyElementTrue": {
-                                "$map": {
+                "filename": {
+                    "$regex": search_pattern,
+                    "$options": "i"
+                }
+            },
+            {
+                "extracted_text": {
+                    "$regex": search_pattern,
+                    "$options": "i"
+                }
+            },
+            {
+                "$expr": {
+                    "$anyElementTrue": {
+                        "$map": {
+                            "input": {
+                                "$objectToArray": {
+                                    "$ifNull": ["$metadata", {}]
+                                }
+                            },
+                            "as": "item",
+                            "in": {
+                                "$regexMatch": {
                                     "input": {
-                                        "$objectToArray": {
-                                            "$ifNull": ["$metadata", {}]
-                                        }
+                                        "$toString": "$$item.v"
                                     },
-                                    "as": "item",
-                                    "in": {
-                                        "$regexMatch": {
-                                            "input": {
-                                                "$toString": "$$item.v"
-                                            },
-                                            "regex": search_pattern,
-                                            "options": "i"
-                                        }
-                                    }
+                                    "regex": search_pattern,
+                                    "options": "i"
                                 }
                             }
                         }
                     }
-                ]
+                }
             }
         ]
     }
 
-    documents = documents_collection.find(search_filter)
+    filters = [access_filter, search_clause]
+
+    if division_filter:
+        filters.append({
+            "division": division_filter
+        })
+
+    if report_type_filter:
+        filters.append({
+            "metadata.Report Type": report_type_filter
+        })
+
+    documents = documents_collection.find({
+        "$and": filters
+    })
 
     results = []
 

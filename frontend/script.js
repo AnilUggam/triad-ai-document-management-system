@@ -417,9 +417,8 @@ function navigateTo(viewId, clickedButton = null) {
         loadMyAccessRequests();
     }
 
-    if (viewId === "accessInboxView" &&
-        currentUser?.role === "admin") {
-        loadAccessInbox();
+    if (viewId === "accessInboxView" && currentUser) {
+    loadAccessInbox();
     }
 
     if (viewId === "metadataView" &&
@@ -472,7 +471,7 @@ function buildAccessNavigation() {
             <span>My Access Requests</span>
         </button>
 
-        ${currentUser?.role === "admin" ? `
+        ${currentUser ? `
             <button class="nav-item" data-view="accessInboxView"
                 onclick="navigateTo('accessInboxView', this)">
                 <span>📥</span>
@@ -500,6 +499,7 @@ async function loadMetadataFields() {
         renderMetadataFilters();
         renderUploadMetadataFields();
         renderMetadataSettingsList();
+        renderAdvancedSearchFilters();
 
     } catch (error) {
         console.error("Unable to load metadata fields:", error);
@@ -663,6 +663,9 @@ async function loadDocuments() {
 
         allDocuments = data.documents || [];
 
+        // Refresh Advanced Search dropdowns
+        renderAdvancedSearchFilters();
+
         renderDocuments(
             currentSearchResults.length ||
             document.getElementById("searchInput")?.value.trim()
@@ -677,7 +680,6 @@ async function loadDocuments() {
         showMessage(error.message, "error");
     }
 }
-
 function updateStatistics() {
     const favorites = getFavorites();
 
@@ -750,11 +752,18 @@ function createDocumentCard(docItem, options = {}) {
             </span>
         </div>
 
+        
         <div class="document-card-actions">
+            <button class="secondary-btn compact-btn"
+                onclick="viewDocumentDetails('${escapeHTML(documentId)}')">
+                View Details
+            </button>
+
             <button class="secondary-btn compact-btn"
                 onclick="previewDocument('${escapeHTML(documentId)}')">
                 Preview
             </button>
+
 
             <button class="primary-btn compact-btn"
                 onclick="downloadDocument('${escapeHTML(documentId)}')">
@@ -1720,8 +1729,8 @@ function renderDiscoveredDocuments(documents) {
     if (!documents.length) {
         container.innerHTML = `
             <div class="empty-state">
-                <h3>No shared documents available</h3>
-                <p>Documents shared by other divisions will appear here.</p>
+                <h3>No documents available</h3>
+                <p>Documents from other divisions will appear here.</p>
             </div>
         `;
         return;
@@ -1768,7 +1777,7 @@ function renderDiscoveredDocuments(documents) {
 
             noteHTML = `
                 <p class="access-note">
-                    ⌛ Waiting for the owning division's admin to review your request.
+                    ⌛ Waiting for the owning division's user or admin to review your request.
                 </p>
             `;
 
@@ -1796,7 +1805,9 @@ function renderDiscoveredDocuments(documents) {
                     ${getFileType(filename)}
                 </span>
 
-                <span class="sharing-status">🌐 Shared</span>
+                <span class="sharing-status">
+    ${doc.is_shared ? "🌐 Shared" : "🔒 Private"}
+</span>
             </div>
 
             <div class="document-card-body">
@@ -2007,7 +2018,7 @@ async function loadAccessInbox() {
         "accessInboxList"
     );
 
-    if (!container || currentUser?.role !== "admin") return;
+    if (!container || !currentUser) return;
 
     try {
         const data = await apiRequest(
@@ -2244,3 +2255,201 @@ document.addEventListener("DOMContentLoaded", async () => {
             .classList.add("hidden");
     }
 });
+
+
+async function runAdvancedSearch() {
+    const query = document.getElementById("advancedSearchInput")
+        .value.trim();
+
+    const division = document.getElementById("advancedDivision")
+        .value.trim();
+
+    const reportType = document.getElementById("advancedReportType")
+        .value.trim();
+
+    const resultsContainer = document.getElementById("advancedSearchResults");
+
+    if (!query) {
+        showMessage("Please enter a search keyword.", "error");
+        return;
+    }
+
+    resultsContainer.innerHTML = "<p>Searching documents...</p>";
+
+    try {
+        const params = new URLSearchParams({
+            q: query
+        });
+
+        if (division) {
+            params.append("division", division);
+        }
+
+        if (reportType) {
+            params.append("report_type", reportType);
+        }
+
+        const data = await apiRequest(`/search?${params.toString()}`);
+
+        const results = data.search_results || [];
+
+        resultsContainer.innerHTML = "";
+
+        if (!results.length) {
+            resultsContainer.innerHTML = `
+                <div class="empty-state">
+                    <h3>No documents found</h3>
+                    <p>Try another keyword or change your filters.</p>
+                </div>
+            `;
+            return;
+        }
+
+        results.forEach(doc => {
+            resultsContainer.appendChild(
+                createDocumentCard(doc, { showSharing: true })
+            );
+        });
+
+    } catch (error) {
+        resultsContainer.innerHTML = "";
+        showMessage(error.message, "error");
+    }
+}
+
+
+function clearAdvancedSearch() {
+    document.getElementById("advancedSearchInput").value = "";
+    document.getElementById("advancedDivision").value = "";
+    document.getElementById("advancedReportType").value = "";
+
+    document.getElementById("advancedSearchResults").innerHTML =
+        "<p>Enter a keyword and click Search.</p>";
+}
+
+function renderAdvancedSearchFilters() {
+    const divisionSelect = document.getElementById("advancedDivision");
+    const reportTypeSelect = document.getElementById("advancedReportType");
+
+    if (!divisionSelect || !reportTypeSelect) return;
+
+    // Division is a document-level property, not a custom metadata field.
+    const divisions = [...new Set(
+        allDocuments
+            .map(doc => doc.division)
+            .filter(Boolean)
+    )];
+
+    divisionSelect.innerHTML =
+        '<option value="">All accessible divisions</option>';
+
+    divisions.forEach(division => {
+        const option = document.createElement("option");
+        option.value = division;
+        option.textContent = division;
+        divisionSelect.appendChild(option);
+    });
+
+    // Report Type comes from the dynamic metadata configuration.
+    const reportTypeField = metadataFields.find(
+        field => field.field_name === "Report Type"
+    );
+
+    reportTypeSelect.innerHTML =
+        '<option value="">All report types</option>';
+
+    if (!reportTypeField) return;
+
+    const reportTypes = [...new Set(
+        allDocuments
+            .map(doc => doc.metadata?.["Report Type"])
+            .filter(value => value !== undefined && value !== null && value !== "")
+            .map(String)
+    )];
+
+    reportTypes.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        reportTypeSelect.appendChild(option);
+    });
+}
+
+function viewDocumentDetails(documentId) {
+    const docItem = allDocuments.find(
+        doc => getDocumentId(doc) === documentId
+    );
+
+    if (!docItem) {
+        showMessage("Document details not found.", "error");
+        return;
+    }
+
+    navigateTo("documentDetailsView");
+
+    const container = document.getElementById(
+        "documentDetailsContent"
+    );
+
+    const metadata = docItem.metadata || {};
+
+    const metadataHTML = Object.entries(metadata).length
+        ? Object.entries(metadata).map(([key, value]) => `
+            <div class="form-group">
+                <label>${escapeHTML(key)}</label>
+                <p>${escapeHTML(String(value ?? ""))}</p>
+            </div>
+        `).join("")
+        : "<p>No custom metadata available.</p>";
+
+    container.innerHTML = `
+        <h2>${escapeHTML(docItem.filename || "Unnamed document")}</h2>
+
+        <div class="metadata-input-grid" style="margin-top:20px;">
+            <div class="form-group">
+                <label>Division</label>
+                <p>${escapeHTML(docItem.division || "Unavailable")}</p>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Date</label>
+                <p>${escapeHTML(formatDate(docItem.upload_date))}</p>
+            </div>
+
+            <div class="form-group">
+                <label>Document Type</label>
+                <p>${escapeHTML(getFileType(docItem.filename || ""))}</p>
+            </div>
+
+<div class="form-group">
+    <label>Sharing Status</label>
+    <p>${docItem.is_shared
+        ? "🌐 Shared with other divisions"
+        : "🔒 Private"}</p>
+</div>
+
+        </div>
+
+        <h3 style="margin-top:24px;">Custom Metadata</h3>
+
+        <div class="metadata-input-grid" style="margin-top:12px;">
+            ${metadataHTML}
+        </div>
+
+        <div class="document-card-actions" style="margin-top:24px;">
+            <button class="secondary-btn compact-btn"
+                onclick="previewDocument('${escapeHTML(getDocumentId(docItem))}')">
+                Preview
+            </button>
+
+            <button class="primary-btn compact-btn"
+                onclick="downloadDocument('${escapeHTML(getDocumentId(docItem))}')">
+                Download
+            </button>
+        </div>
+    `;
+}
+
+window.viewDocumentDetails = viewDocumentDetails;
+window.runAdvancedSearch = runAdvancedSearch;
+window.clearAdvancedSearch = clearAdvancedSearch;

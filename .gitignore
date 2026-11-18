@@ -28,3 +28,6 @@ frontend_source.txt
 ocr_test.txt
 project-source-review.txt
 sample.txt
+
+# Local security backup
+backend/users_backup_*.json

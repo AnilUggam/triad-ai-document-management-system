@@ -493,7 +493,7 @@ def update_document_sharing(document_id):
 
     # Only an admin of the owning division can change sharing.
     if (
-        user.get("role") != "admin"
+        user.get("role") not in ("admin", "system_admin")
         or document["division"] != user["division"]
     ):
         return jsonify({

@@ -34,7 +34,7 @@ def get_admin_user():
     if not user:
         return None, (jsonify({"error": "User not found"}), 404)
 
-    if user.get("role") != "admin":
+    if user.get("role") not in ("admin", "system_admin"):
         return None, (jsonify({"error": "Admin access required"}), 403)
 
     return user, None

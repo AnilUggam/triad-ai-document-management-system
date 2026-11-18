@@ -325,7 +325,7 @@ async function openApplication() {
 
     loadMyAccessRequests();
 
-    if (currentUser.role === "admin") {
+    if (["admin", "system_admin"].includes(currentUser.role)) {
         loadAccessInbox();
     }
 
@@ -368,7 +368,7 @@ const VIEW_TITLES = {
 function navigateTo(viewId, clickedButton = null) {
 
     // Protect Metadata Settings from normal users
-    if (viewId === "metadataView" && currentUser?.role !== "admin") {
+    if (viewId === "metadataView" && !["admin", "system_admin"].includes(currentUser?.role)) {
         showMessage("Admin access required", "error");
         viewId = "homeView";
         clickedButton = null;
@@ -422,7 +422,7 @@ function navigateTo(viewId, clickedButton = null) {
     }
 
     if (viewId === "metadataView" &&
-        currentUser?.role === "admin") {
+        ["admin", "system_admin"].includes(currentUser?.role)) {
         loadMetadataSettings();
     }
 
@@ -635,7 +635,7 @@ function buildMetadataNavigation() {
         return;
     }
 
-    item.classList.toggle("hidden", currentUser?.role !== "admin");
+    item.classList.toggle("hidden", !["admin", "system_admin"].includes(currentUser?.role));
 }
 /* ==========================================================
    DASHBOARD AND DOCUMENT LIST
@@ -713,7 +713,7 @@ function createDocumentCard(docItem, options = {}) {
 
     const sharingControl =
         options.showSharing &&
-        currentUser?.role === "admin" &&
+        ["admin", "system_admin"].includes(currentUser?.role) &&
         isOwnDivision
             ? `
                 <button class="secondary-btn compact-btn sharing-toggle-btn"
@@ -1121,7 +1121,7 @@ if (metadataAdminForm) {
 
 // Load and display metadata settings.
 async function loadMetadataSettings() {
-    if (currentUser?.role !== "admin") {
+    if (!["admin", "system_admin"].includes(currentUser?.role)) {
         showMessage("Only administrators can manage metadata fields.", "error");
         return;
     }
@@ -1198,7 +1198,7 @@ function renderMetadataSettingsList() {
 async function saveMetadataField(event) {
     event.preventDefault();
 
-    if (currentUser?.role !== "admin") {
+    if (!["admin", "system_admin"].includes(currentUser?.role)) {
         showMessage("Only administrators can manage metadata fields.", "error");
         return;
     }
@@ -1269,7 +1269,7 @@ async function saveMetadataField(event) {
 
 // Load an existing field into the form for editing.
 function editMetadataField(fieldId) {
-    if (currentUser?.role !== "admin") return;
+    if (!["admin", "system_admin"].includes(currentUser?.role)) return;
 
     const field = metadataFields.find(
         item => item.field_id === fieldId
